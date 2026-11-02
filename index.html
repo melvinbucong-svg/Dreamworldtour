@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My World Explorer - Class Travel Journal & Passport</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Html2canvas for Passport Image Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Canvas Confetti for Celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Playfair+Display:wght@700;900&family=Courier+Prime:wght@700&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(180deg, #38bdf8 0%, #818cf8 40%, #c084fc 100%);
+            min-height: 100vh;
+        }
+
+        .font-passport {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .font-mrz {
+            font-family: 'Courier Prime', monospace;
+            letter-spacing: 2px;
+        }
+
+        /* Animated Sky Background */
+        .sky-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.45);
+            border-radius: 50px;
+            animation: floatCloud 35s linear infinite;
+        }
+
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.45);
+            border-radius: 50%;
+        }
+
+        .cloud1 { width: 140px; height: 45px; top: 10%; left: -150px; animation-duration: 42s; }
+        .cloud1::before { width: 50px; height: 50px; top: -20px; left: 25px; }
+        .cloud1::after { width: 60px; height: 60px; top: -30px; left: 55px; }
+
+        .cloud2 { width: 200px; height: 60px; top: 35%; left: -220px; animation-duration: 55s; animation-delay: 8s; }
+        .cloud2::before { width: 70px; height: 70px; top: -30px; left: 35px; }
+        .cloud2::after { width: 85px; height: 85px; top: -40px; left: 85px; }
+
+        @keyframes floatCloud {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 300px)); }
+        }
+
+        /* Hot Air Balloon Animation */
+        .balloon {
+            position: absolute;
+            top: 15%;
+            right: 8%;
+            animation: floatBalloon 6s ease-in-out infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes floatBalloon {
+            0% { transform: translateY(0px) rotate(-2deg); }
+            100% { transform: translateY(-25px) rotate(2deg); }
+        }
+
+        /* Vibrant Rubber Passport Stamp Effect */
+        .stamp-mark {
+            border: 3px dashed #1e40af;
+            color: #1e3a8a;
+            transform: rotate(-6deg);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .stamp-mark:hover {
+            transform: rotate(0deg) scale(1.03);
+            box-shadow: 0 14px 20px -3px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.6);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-16 relative">
+
+    <div class="sky-container">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="balloon text-5xl md:text-7xl filter drop-shadow-xl select-none" title="Up, up and away!">
+            🎈
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 max-w-6xl mx-auto px-4 pt-6">
+
+        <!-- Header -->
+        <header class="bg-white/90 backdrop-blur-md rounded-3xl p-4 md:p-6 shadow-2xl border border-white/50 mb-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                
+                <div class="flex items-center gap-3 text-center md:text-left">
+                    <div class="w-14 h-14 bg-gradient-to-tr from-sky-400 via-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg text-white">
+                        🌍
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-black bg-gradient-to-r from-sky-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                            My World Explorer
+                        </h1>
+                        <p class="text-xs md:text-sm font-bold text-slate-500">Grade 6 Class Travel Journal & Official Passport</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="flex items-center bg-slate-100 p-1.5 rounded-2xl gap-1 w-full md:w-auto overflow-x-auto">
+                    <button id="tabScrapbook" onclick="switchTab('scrapbook')" class="flex-1 md:flex-none px-5 py-2.5 rounded-xl font-black text-xs md:text-sm transition flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-md">
+                        <span>📸 Scrapbook</span>
+                        <span id="badgeCount" class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full text-xs font-bold">0</span>
+                    </button>
+                    <button id="tabPassport" onclick="switchTab('passport')" class="flex-1 md:flex-none px-5 py-2.5 rounded-xl font-black text-xs md:text-sm transition flex items-center justify-center gap-2 text-slate-600 hover:text-indigo-600">
+                        <span>Passport Official Passport</span>
+                        <span id="stampTotalPill" class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-bold">0 Visas</span>
+                    </button>
+                </nav>
+
+            </div>
+        </header>
+
+        <!-- VIEW 1: SCRAPBOOK FEED -->
+        <main id="viewScrapbook" class="space-y-6">
+
+            <!-- Action Toolbar -->
+            <div class="bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+                
+                <!-- Search and Filter -->
+                <div class="flex items-center gap-2 w-full sm:w-auto flex-1 max-w-md">
+                    <div class="relative w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="searchInput" oninput="renderScrapbook()" placeholder="Search destination, country or food..." class="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-semibold text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    </div>
+                </div>
+
+                <!-- Add Button, Save/Download & Reset -->
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+                    <button onclick="saveScrapbookManual()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-4 py-2.5 rounded-xl shadow-md text-xs md:text-sm flex items-center justify-center gap-2 transition active:scale-95">
+                        <i class="fa-solid fa-floppy-disk text-base"></i>
+                        <span id="saveScrapbookBtnText">Save Scrapbook</span>
+                    </button>
+                    <button onclick="openAddModal()" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-extrabold px-4 py-2.5 rounded-xl shadow-md text-xs md:text-sm flex items-center justify-center gap-2 transition active:scale-95">
+                        <i class="fa-solid fa-plus-circle text-base"></i>
+                        <span>Add New Destination</span>
+                    </button>
+                    <button onclick="exportDataJSON()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Download Backup JSON File">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span class="hidden lg:inline">Download JSON</span>
+                    </button>
+                    <label class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Import Saved JSON File">
+                        <i class="fa-solid fa-file-arrow-up"></i>
+                        <span class="hidden lg:inline">Import</span>
+                        <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importDataJSON(event)">
+                    </label>
+                    <button onclick="confirmResetData()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Reset Data to Default">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span class="hidden md:inline">Reset</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrapbook Postcards Grid -->
+            <div id="scrapbookGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamic Postcards Rendered via JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyScrapbook" class="hidden bg-white/90 backdrop-blur-md rounded-3xl p-12 text-center border border-white/60 shadow-xl max-w-lg mx-auto my-12">
+                <div class="text-6xl mb-4">✈️</div>
+                <h3 class="text-xl font-black text-slate-800 mb-2">No Destinations Found</h3>
+                <p class="text-sm text-slate-500 font-medium mb-6">Be the first student to add a wonder of the world!</p>
+                <button onclick="openAddModal()" class="bg-indigo-600 text-white font-extrabold px-6 py-3 rounded-2xl shadow-lg hover:bg-indigo-700 transition">
+                    + Add Destination Now
+                </button>
+            </div>
+
+        </main>
+
+        <!-- VIEW 2: OFFICIAL PASSPORT -->
+        <section id="viewPassport" class="hidden space-y-6">
+
+            <!-- Download Button Toolbar -->
+            <div class="flex items-center justify-between bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/50">
+                <div class="flex items-center gap-2 text-indigo-900 font-extrabold text-sm md:text-base">
+                    <span>Passport Official Explorer Passport ID</span>
+                </div>
+                <button onclick="downloadPassportPNG()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black px-5 py-2.5 rounded-xl shadow-lg text-xs md:text-sm flex items-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Passport Image</span>
+                </button>
+            </div>
+
+            <!-- Capture Container for html2canvas (Bright & Colorful Theme) -->
+            <div id="passportCaptureArea" class="bg-gradient-to-br from-amber-50 via-sky-50 to-indigo-50 rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-indigo-400 text-slate-800 max-w-4xl mx-auto space-y-6">
+                
+                <!-- Passport Header Cover Bar -->
+                <div class="bg-gradient-to-r from-indigo-700 via-blue-700 to-indigo-800 p-4 rounded-2xl shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-white border border-indigo-300">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-amber-400/20 border-2 border-amber-300 rounded-full flex items-center justify-center text-2xl text-amber-300 shadow-inner flex-shrink-0">
+                            ⚜️
+                        </div>
+                        <div>
+                            <div class="text-[11px] uppercase tracking-widest text-amber-300 font-black leading-tight">Official Student Document</div>
+                            <h2 class="text-xl md:text-2xl font-black font-passport tracking-wider text-white leading-normal">WORLD EXPLORER PASSPORT</h2>
+                        </div>
+                    </div>
+
+                    <!-- Verified Badge Seal & Save Action -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="savePassportInfo(true)" class="bg-amber-400 hover:bg-amber-500 active:scale-95 text-indigo-950 font-extrabold px-4 py-2 rounded-2xl text-xs shadow-md transition flex items-center gap-1.5 border border-amber-200">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span id="savePassportBtnText">Save Passport</span>
+                        </button>
+                        <div class="hidden sm:flex items-center gap-2 bg-emerald-500 text-white font-black px-4 py-2 rounded-2xl text-xs shadow-md border border-emerald-300">
+                            <i class="fa-solid fa-circle-check text-emerald-100"></i>
+                            <span>VISA APPROVED</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passport ID Page Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center bg-white/90 p-6 rounded-2xl border-2 border-indigo-200 shadow-md">
+                    
+                    <!-- Photo Upload Box -->
+                    <div class="flex flex-col items-center justify-center space-y-3">
+                        <div class="relative w-36 h-44 bg-slate-100 border-4 border-amber-400 rounded-2xl overflow-hidden shadow-md flex items-center justify-center group flex-shrink-0">
+                            <img id="passportPhotoImg" src="https://placehold.co/150x180/334155/cbd5e1?text=Student+Photo" alt="Student Photo" class="w-full h-full object-cover">
+                            <label for="passportPhotoInput" class="absolute inset-0 bg-indigo-900/60 text-white flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition text-xs font-bold">
+                                <i class="fa-solid fa-camera text-xl mb-1"></i>
+                                <span>Change Photo</span>
+                            </label>
+                            <input type="file" id="passportPhotoInput" accept="image/*" class="hidden" onchange="handlePassportPhoto(event)">
+                        </div>
+                        <span class="text-[10px] text-indigo-700 uppercase tracking-widest font-extrabold bg-indigo-100 px-3 py-1 rounded-full">Student Explorer ID</span>
+                    </div>
+
+                    <!-- Editable Student Details -->
+                    <div class="md:col-span-2 space-y-4">
+                        
+                        <!-- Full Name -->
+                        <div class="flex flex-col">
+                            <label class="block text-[11px] font-black uppercase text-indigo-800 tracking-wider mb-1 leading-snug">Explorer Name</label>
+                            <input type="text" id="passportNameInput" oninput="savePassportInfo(false)" value="Alex Rivera" class="w-full bg-indigo-50/70 border-2 border-indigo-200 rounded-xl px-4 py-3 font-extrabold text-base leading-normal text-indigo-950 focus:outline-none focus:border-indigo-500 focus:bg-white shadow-inner">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Class / Grade -->
+                            <div class="flex flex-col">
+                                <label class="block text-[11px] font-black uppercase text-indigo-800 tracking-wider mb-1 leading-snug">Grade & Section</label>
+                                <input type="text" id="passportGradeInput" oninput="savePassportInfo(false)" value="Grade 6 - Voyager" class="w-full bg-indigo-50/70 border-2 border-indigo-200 rounded-xl px-3 py-3 font-bold text-xs md:text-sm leading-normal text-indigo-950 focus:outline-none focus:border-indigo-500 focus:bg-white shadow-inner">
+                            </div>
+
+                            <!-- Passport Number -->
+                            <div class="flex flex-col">
+                                <label class="block text-[11px] font-black uppercase text-indigo-800 tracking-wider mb-1 leading-snug">Passport No.</label>
+                                <input type="text" id="passportNumberInput" oninput="savePassportInfo(false)" value="EXP-2026-889" class="w-full bg-indigo-50/70 border-2 border-indigo-200 rounded-xl px-3 py-3 font-bold text-xs md:text-sm leading-normal text-indigo-950 focus:outline-none focus:border-indigo-500 focus:bg-white shadow-inner">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- MRZ Code Bar -->
+                <div class="bg-indigo-950 p-4 rounded-xl border-2 border-indigo-900 font-mrz text-[11px] md:text-xs text-amber-300 tracking-widest text-center leading-relaxed select-none shadow-md overflow-hidden">
+                    P&lt;WLD&lt;&lt;RIVERA&lt;&lt;ALEX&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br>
+                    EXP88920266&lt;7USA0602129M20261013&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;04
+                </div>
+
+                <!-- Visa Stamps Grid Section -->
+                <div class="pt-2 space-y-4">
+                    <div class="flex items-center justify-between bg-white/80 p-3.5 rounded-2xl border border-indigo-100 shadow-sm">
+                        <h3 class="text-base md:text-lg font-black text-indigo-900 flex items-center gap-2 leading-tight">
+                            <span>✈️ Approved Visa Entry Stamps</span>
+                        </h3>
+                        <span id="visaCountBadge" class="bg-amber-100 border border-amber-300 text-amber-900 px-3 py-1 rounded-full text-xs font-black shadow-sm">
+                            0 Visas Earned
+                        </span>
+                    </div>
+
+                    <!-- Grid of Visas -->
+                    <div id="passportStampsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <!-- Stamps rendered dynamically -->
+                    </div>
+
+                    <!-- Empty Stamps State -->
+                    <div id="emptyPassportHint" class="bg-white/70 border-2 border-dashed border-indigo-300 rounded-2xl p-8 text-center shadow-inner">
+                        <div class="text-4xl mb-2">🏷️</div>
+                        <p class="text-xs md:text-sm font-bold text-indigo-900">No visas stamped yet!</p>
+                        <p class="text-[11px] text-slate-600 mt-1">Go to the Scrapbook tab and click <span class="text-indigo-600 font-black">"✈️ Book A Flight"</span> on your favorite places!</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- MODAL 1: ADD / EDIT DESTINATION -->
+    <div id="addModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100">
+            
+            <div class="p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between rounded-t-3xl">
+                <h3 id="modalTitle" class="text-xl font-black flex items-center gap-2">
+                    <span>✨ Add New Destination</span>
+                </h3>
+                <button type="button" onclick="confirmCloseAddModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center justify-center transition" title="Close window">
+                    ✕
+                </button>
+            </div>
+
+            <form id="destinationForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-5">
+                <input type="hidden" id="editEntryId" value="">
+
+                <!-- Place Name & Country Picker -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1">Place / Landmark Name *</label>
+                        <input type="text" id="formPlaceName" oninput="saveFormDraft()" required placeholder="e.g. Eiffel Tower, Mt. Fuji..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1">Country *</label>
+                        <select id="formCountry" onchange="saveFormDraft()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <!-- Populated with full 195+ World Countries -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Photo Upload & URL -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-extrabold text-slate-700 uppercase">Destination Photo *</label>
+                    <div class="flex items-center gap-3">
+                        <label for="formPhotoFile" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-extrabold px-4 py-2.5 rounded-xl text-xs cursor-pointer transition flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+                            <span>Upload Image</span>
+                        </label>
+                        <input type="file" id="formPhotoFile" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                        
+                        <span class="text-xs text-slate-400 font-bold">OR</span>
+
+                        <input type="url" id="formPhotoUrl" oninput="previewPhotoUrl(this.value); saveFormDraft();" placeholder="Paste image web link (https://...)" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-bold text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <!-- Image Preview Frame -->
+                    <div class="relative h-44 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 mt-2 flex items-center justify-center">
+                        <img id="formPhotoPreview" src="https://placehold.co/600x300/e2e8f0/64748b?text=Photo+Preview" alt="Preview" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <!-- Guided Writing Prompts Section -->
+                <div class="space-y-4 pt-2">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg inline-block">
+                            📝 Student Travel Journal Prompts (Optional)
+                        </h4>
+                        <span id="draftStatusBadge" class="hidden text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                            ✓ Draft Auto-Saved
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">👁️ What can you SEE here?</label>
+                            <textarea id="formSee" oninput="saveFormDraft()" rows="2" placeholder="e.g. Beautiful snow peaks, ancient stone walls..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-semibold text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">🍕 What can you EAT here?</label>
+                            <textarea id="formEat" oninput="saveFormDraft()" rows="2" placeholder="e.g. Fresh ramen noodles, gelatos, tacos..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-semibold text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">🛍️ What can you BUY here?</label>
+                            <textarea id="formBuy" oninput="saveFormDraft()" rows="2" placeholder="e.g. Handcrafted keychains, traditional fans..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-semibold text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">🎉 What can you ENJOY doing?</label>
+                            <textarea id="formEnjoy" oninput="saveFormDraft()" rows="2" placeholder="e.g. Hiking up the trail, boat cruising..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-semibold text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="confirmCloseAddModal()" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 text-xs transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-md text-xs transition">
+                        Save Destination
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- MODAL 2: DETAIL LIGHTBOX -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 relative">
+            
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-slate-900/60 hover:bg-slate-900 text-white font-bold flex items-center justify-center transition">
+                ✕
+            </button>
+
+            <div id="detailContent" class="p-6 space-y-6">
+                <!-- Content injected dynamically -->
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 rounded-b-3xl">
+                <div class="flex items-center gap-2">
+                    <button onclick="printCurrentDetail()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-4 py-2 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                        <i class="fa-solid fa-print"></i> Print Postcard
+                    </button>
+                    <button onclick="deleteFromDetailModal()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-extrabold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-trash-can"></i> Delete
+                    </button>
+                </div>
+                <button onclick="closeDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Web Audio Synthesizer for Interactive Sound Effects ---
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playClickSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.05);
+            } catch (e) {
+                // Ignore audio restriction errors gracefully
+            }
+        }
+
+        function playStampSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(220, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            } catch (e) {
+                // Ignore audio restriction errors gracefully
+            }
+        }
+
+        // --- Real-time Form Draft Saving ---
+        function saveFormDraft() {
+            // Only auto-save draft when creating a NEW destination, not editing existing ones
+            if (document.getElementById('editEntryId').value) return;
+
+            const draft = {
+                placeName: document.getElementById('formPlaceName').value,
+                country: document.getElementById('formCountry').value,
+                photoUrl: document.getElementById('formPhotoUrl').value,
+                see: document.getElementById('formSee').value,
+                eat: document.getElementById('formEat').value,
+                buy: document.getElementById('formBuy').value,
+                enjoy: document.getElementById('formEnjoy').value
+            };
+
+            localStorage.setItem('mwe_destination_draft_v1', JSON.stringify(draft));
+
+            const badge = document.getElementById('draftStatusBadge');
+            if (badge) {
+                badge.classList.remove('hidden');
+                setTimeout(() => badge.classList.add('hidden'), 2000);
+            }
+        }
+
+        function loadFormDraft() {
+            const savedDraft = localStorage.getItem('mwe_destination_draft_v1');
+            if (!savedDraft) return false;
+
+            try {
+                const draft = JSON.parse(savedDraft);
+                if (draft.placeName || draft.see || draft.eat || draft.buy || draft.enjoy) {
+                    if (draft.placeName) document.getElementById('formPlaceName').value = draft.placeName;
+                    if (draft.country) document.getElementById('formCountry').value = draft.country;
+                    if (draft.photoUrl) {
+                        document.getElementById('formPhotoUrl').value = draft.photoUrl;
+                        document.getElementById('formPhotoPreview').src = draft.photoUrl;
+                    }
+                    if (draft.see) document.getElementById('formSee').value = draft.see;
+                    if (draft.eat) document.getElementById('formEat').value = draft.eat;
+                    if (draft.buy) document.getElementById('formBuy').value = draft.buy;
+                    if (draft.enjoy) document.getElementById('formEnjoy').value = draft.enjoy;
+                    return true;
+                }
+            } catch(e) {}
+            return false;
+        }
+
+        function clearFormDraft() {
+            localStorage.removeItem('mwe_destination_draft_v1');
+        }
+
+        function openAddModal() {
+            playClickSound();
+            document.getElementById('modalTitle').textContent = '✨ Add New Destination';
+            document.getElementById('destinationForm').reset();
+            document.getElementById('editEntryId').value = '';
+            document.getElementById('formPhotoPreview').src = 'https://placehold.co/600x300/e2e8f0/64748b?text=Photo+Preview';
+            
+            // Check if there is an unsaved draft from before and restore it
+            loadFormDraft();
+
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function confirmCloseAddModal() {
+            const hasTypedContent = 
+                document.getElementById('formPlaceName').value ||
+                document.getElementById('formSee').value ||
+                document.getElementById('formEat').value ||
+                document.getElementById('formBuy').value ||
+                document.getElementById('formEnjoy').value;
+
+            if (hasTypedContent && !document.getElementById('editEntryId').value) {
+                if (confirm('Don\'t worry! Your typed draft is saved automatically. Are you sure you want to close this window for now?')) {
+                    closeAddModal();
+                }
+            } else {
+                closeAddModal();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('mwe_destinations_v2', JSON.stringify(destinations));
+            localStorage.setItem('mwe_booked_visas_v2', JSON.stringify(bookedVisas));
+        }
+
+        function saveScrapbookManual() {
+            playClickSound();
+            saveData();
+            const btnText = document.getElementById('saveScrapbookBtnText');
+            if (btnText) {
+                btnText.textContent = 'Saved! ✓';
+                setTimeout(() => {
+                    btnText.textContent = 'Save Scrapbook';
+                }, 2000);
+            }
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 35, spread: 40 });
+            }
+        }
+
+        function savePassportInfo(showFeedback = false) {
+            const info = {
+                name: document.getElementById('passportNameInput').value,
+                grade: document.getElementById('passportGradeInput').value,
+                number: document.getElementById('passportNumberInput').value,
+                photo: document.getElementById('passportPhotoImg').src
+            };
+            localStorage.setItem('mwe_passport_info_v2', JSON.stringify(info));
+
+            if (showFeedback) {
+                playClickSound();
+                const btnText = document.getElementById('savePassportBtnText');
+                if (btnText) {
+                    btnText.textContent = 'Saved! ✓';
+                    setTimeout(() => {
+                        btnText.textContent = 'Save Passport';
+                    }, 2000);
+                }
+            }
+        }
+
+        function populateCountrySelect() {
+            const select = document.getElementById('formCountry');
+            if (!select) return;
+            select.innerHTML = WORLD_COUNTRIES.map(c => 
+                `<option value="${c.name}">${c.flag} ${c.name}</option>`
+            ).join('');
+        }
+
+        function render() {
+            renderScrapbook();
+            renderPassportStamps();
+            updateStats();
+        }
+
+        function updateStats() {
+            const badgeCount = document.getElementById('badgeCount');
+            const stampTotalPill = document.getElementById('stampTotalPill');
+            const visaCountBadge = document.getElementById('visaCountBadge');
+
+            if (badgeCount) badgeCount.textContent = destinations.length;
+            if (stampTotalPill) stampTotalPill.textContent = `${bookedVisas.length} Visas`;
+            if (visaCountBadge) visaCountBadge.textContent = `${bookedVisas.length} Visas Earned`;
+        }
+
+        function renderScrapbook() {
+            const grid = document.getElementById('scrapbookGrid');
+            const empty = document.getElementById('emptyScrapbook');
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            const filtered = destinations.filter(item => 
+                item.placeName.toLowerCase().includes(query) ||
+                item.country.toLowerCase().includes(query) ||
+                (item.see && item.see.toLowerCase().includes(query)) ||
+                (item.eat && item.eat.toLowerCase().includes(query)) ||
+                (item.buy && item.buy.toLowerCase().includes(query)) ||
+                (item.enjoy && item.enjoy.toLowerCase().includes(query))
+            );
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            grid.innerHTML = '';
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-3xl overflow-hidden shadow-xl border border-slate-100 hover:shadow-2xl transition duration-300 flex flex-col group';
+                
+                let promptsHtml = '';
+                if (item.see) promptsHtml += `<p class="line-clamp-1"><strong class="text-indigo-600">👁️ See:</strong> ${item.see}</p>`;
+                if (item.eat) promptsHtml += `<p class="line-clamp-1"><strong class="text-amber-600">🍕 Eat:</strong> ${item.eat}</p>`;
+                if (item.buy) promptsHtml += `<p class="line-clamp-1"><strong class="text-emerald-600">🛍️ Buy:</strong> ${item.buy}</p>`;
+                if (item.enjoy) promptsHtml += `<p class="line-clamp-1"><strong class="text-purple-600">🎉 Enjoy:</strong> ${item.enjoy}</p>`;
+                
+                if (!promptsHtml) {
+                    promptsHtml = `<p class="text-slate-400 italic">No description added yet.</p>`;
+                }
+
+                card.innerHTML = `
+                    <div class="relative h-52 overflow-hidden bg-slate-100 cursor-pointer" onclick="openDetailModal('${item.id}')">
+                        <img src="${item.photoUrl}" alt="${item.placeName}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Destination'">
+                        <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black shadow-md flex items-center gap-1.5">
+                            <span>${item.flag}</span>
+                            <span>${item.country}</span>
+                        </div>
+                    </div>
+
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 onclick="openDetailModal('${item.id}')" class="text-lg font-black text-slate-800 hover:text-indigo-600 cursor-pointer transition line-clamp-1">
+                                    ${item.placeName}
+                                </h3>
+                                <button onclick="openEditModal('${item.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1" title="Edit Entry">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                    <span class="hidden sm:inline">Edit</span>
+                                </button>
+                            </div>
+
+                            <div class="mt-3 space-y-1.5 text-xs text-slate-600">
+                                ${promptsHtml}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
+                            <span class="text-xs font-extrabold text-slate-600 flex items-center gap-1">
+                                <span>⭐ Votes:</span>
+                                <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-lg text-xs font-black">${item.votes || 0}</span>
+                            </span>
+
+                            <div class="flex items-center gap-1">
+                                <button onclick="changeVote('${item.id}', 1)" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs px-2.5 py-1 rounded-xl shadow-sm transition active:scale-95" title="Upvote (+1)">
+                                    +1 👍
+                                </button>
+                                <button onclick="changeVote('${item.id}', -1)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs px-2 py-1 rounded-xl transition" title="Undo Vote (-1)">
+                                    -1
+                                </button>
+                                <button onclick="resetVote('${item.id}')" class="bg-slate-200 hover:bg-slate-300 text-slate-500 font-bold text-xs px-2 py-1 rounded-xl transition" title="Reset Votes to 0">
+                                    ↺
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                            <button onclick="bookFlightToDestination('${item.id}')" class="flex-1 bg-gradient-to-r from-sky-500 via-indigo-600 to-purple-600 hover:from-sky-600 hover:to-indigo-700 text-white py-2.5 rounded-xl font-black text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95">
+                                <span>✈️ Book A Flight</span>
+                            </button>
+
+                            <button onclick="deleteEntry('${item.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5" title="Delete Destination">
+                                <i class="fa-solid fa-trash-can"></i>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function changeVote(id, delta) {
+            playClickSound();
+            const item = destinations.find(d => d.id === id);
+            if (item) {
+                item.votes = Math.max(0, (item.votes || 0) + delta);
+                saveData();
+                renderScrapbook();
+            }
+        }
+
+        function resetVote(id) {
+            playClickSound();
+            const item = destinations.find(d => d.id === id);
+            if (item) {
+                item.votes = 0;
+                saveData();
+                renderScrapbook();
+            }
+        }
+
+        function bookFlightToDestination(id) {
+            playStampSound();
+            const item = destinations.find(d => d.id === id);
+            if (!item) return;
+
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 70,
+                    spread: 60,
+                    origin: { y: 0.6 }
+                });
+            }
+
+            const existing = bookedVisas.find(v => v.placeId === id);
+            if (!existing) {
+                bookedVisas.push({
+                    id: 'visa-' + Date.now(),
+                    placeId: id,
+                    placeName: item.placeName,
+                    country: item.country,
+                    countryCode: item.countryCode,
+                    flag: item.flag,
+                    issueDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                });
+                saveData();
+            }
+
+            renderPassportStamps();
+            updateStats();
+            switchTab('passport');
+        }
+
+        function renderPassportStamps() {
+            const grid = document.getElementById('passportStampsGrid');
+            const empty = document.getElementById('emptyPassportHint');
+
+            if (!grid) return;
+
+            if (bookedVisas.length === 0) {
+                grid.innerHTML = '';
+                if (empty) empty.classList.remove('hidden');
+                return;
+            }
+
+            if (empty) empty.classList.add('hidden');
+            grid.innerHTML = '';
+
+            bookedVisas.forEach(visa => {
+                const stamp = document.createElement('div');
+                stamp.className = 'stamp-mark rounded-2xl p-4 text-center flex flex-col items-center justify-center space-y-1 relative group cursor-pointer';
+                stamp.innerHTML = `
+                    <div class="text-2xl">${visa.flag || '✈️'}</div>
+                    <div class="font-black text-xs uppercase tracking-wider text-indigo-900 line-clamp-1">${visa.country}</div>
+                    <div class="text-[10px] font-bold text-blue-700 line-clamp-1">${visa.placeName}</div>
+                    <div class="text-[9px] font-black uppercase text-slate-600 tracking-widest mt-1">${visa.issueDate}</div>
+                    <div class="text-[8px] bg-emerald-500 text-white font-black px-2 py-0.5 rounded-full mt-1 shadow-sm">APPROVED</div>
+                `;
+                grid.appendChild(stamp);
+            });
+        }
+
+        function exportDataJSON() {
+            playClickSound();
+            const exportData = {
+                destinations: destinations,
+                bookedVisas: bookedVisas,
+                passportInfo: {
+                    name: document.getElementById('passportNameInput').value,
+                    grade: document.getElementById('passportGradeInput').value,
+                    number: document.getElementById('passportNumberInput').value,
+                    photo: document.getElementById('passportPhotoImg').src
+                }
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `World_Explorer_Data_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importDataJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.destinations) destinations = imported.destinations;
+                    if (imported.bookedVisas) bookedVisas = imported.bookedVisas;
+                    if (imported.passportInfo) {
+                        document.getElementById('passportNameInput').value = imported.passportInfo.name || 'Alex Rivera';
+                        document.getElementById('passportGradeInput').value = imported.passportInfo.grade || 'Grade 6 - Voyager';
+                        document.getElementById('passportNumberInput').value = imported.passportInfo.number || 'EXP-2026-889';
+                        if (imported.passportInfo.photo) {
+                            document.getElementById('passportPhotoImg').src = imported.passportInfo.photo;
+                        }
+                    }
+                    saveData();
+                    savePassportInfo(false);
+                    render();
+                    alert('Data successfully imported!');
+                } catch (err) {
+                    alert('Invalid JSON data file format.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function switchTab(tab) {
+            playClickSound();
+            const viewScrapbook = document.getElementById('viewScrapbook');
+            const viewPassport = document.getElementById('viewPassport');
+            const tabScrapbook = document.getElementById('tabScrapbook');
+            const tabPassport = document.getElementById('tabPassport');
+
+            if (tab === 'scrapbook') {
+                viewScrapbook.classList.remove('hidden');
+                viewPassport.classList.add('hidden');
+
+                tabScrapbook.className = 'flex-1 md:flex-none px-5 py-2.5 rounded-xl font-black text-xs md:text-sm transition flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-md';
+                tabPassport.className = 'flex-1 md:flex-none px-5 py-2.5 rounded-xl font-black text-xs md:text-sm transition flex items-center justify-center gap-2 text-slate-600 hover:text-indigo-600';
+            } else {
+                viewScrapbook.classList.add('hidden');
+                viewPassport.classList.remove('hidden');
+
+                tabPassport.className = 'flex-1 md:flex-none px-5 py-2.5 rounded-xl font-black text-xs md:text-sm transition flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-md';
+                tabScrapbook.className = 'flex-1 md:flex-none px-5 py-2.5 rounded-xl font-black text-xs md:text-sm transition flex items-center justify-center gap-2 text-slate-600 hover:text-indigo-600';
+            }
+        }
+
+        function handlePassportPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('passportPhotoImg').src = e.target.result;
+                    savePassportInfo(false);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function openEditModal(id) {
+            playClickSound();
+            const item = destinations.find(d => d.id === id);
+            if (!item) return;
+
+            document.getElementById('modalTitle').textContent = '✏️ Edit Destination';
+            document.getElementById('editEntryId').value = item.id;
+            document.getElementById('formPlaceName').value = item.placeName;
+            document.getElementById('formCountry').value = item.country;
+            document.getElementById('formPhotoUrl').value = item.photoUrl;
+            document.getElementById('formPhotoPreview').src = item.photoUrl;
+            document.getElementById('formSee').value = item.see || '';
+            document.getElementById('formEat').value = item.eat || '';
+            document.getElementById('formBuy').value = item.buy || '';
+            document.getElementById('formEnjoy').value = item.enjoy || '';
+
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('formPhotoPreview').src = e.target.result;
+                    document.getElementById('formPhotoUrl').value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function previewPhotoUrl(url) {
+            if (url) {
+                document.getElementById('formPhotoPreview').src = url;
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            playClickSound();
+
+            const editId = document.getElementById('editEntryId').value;
+            const countryName = document.getElementById('formCountry').value;
+            const countryObj = WORLD_COUNTRIES.find(c => c.name === countryName) || { flag: '🌍', code: 'UN' };
+
+            const photoVal = document.getElementById('formPhotoUrl').value || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
+
+            const newEntry = {
+                id: editId || 'dest-' + Date.now(),
+                placeName: document.getElementById('formPlaceName').value,
+                country: countryName,
+                countryCode: countryObj.code,
+                flag: countryObj.flag,
+                photoUrl: photoVal,
+                see: document.getElementById('formSee').value,
+                eat: document.getElementById('formEat').value,
+                buy: document.getElementById('formBuy').value,
+                enjoy: document.getElementById('formEnjoy').value,
+                votes: 0
+            };
+
+            if (editId) {
+                const idx = destinations.findIndex(d => d.id === editId);
+                if (idx !== -1) {
+                    newEntry.votes = destinations[idx].votes || 0;
+                    destinations[idx] = newEntry;
+                }
+            } else {
+                destinations.unshift(newEntry);
+                clearFormDraft();
+            }
+
+            saveData();
+            render();
+            closeAddModal();
+
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 50, spread: 50 });
+            }
+        }
+
+        function deleteEntry(id) {
+            playClickSound();
+            if (confirm('Are you sure you want to delete this destination postcard?')) {
+                destinations = destinations.filter(d => d.id !== id);
+                bookedVisas = bookedVisas.filter(v => v.placeId !== id);
+                saveData();
+                render();
+            }
+        }
+
+        function deleteFromDetailModal() {
+            if (currentDetailId) {
+                deleteEntry(currentDetailId);
+                closeDetailModal();
+            }
+        }
+
+        function openDetailModal(id) {
+            playClickSound();
+            const item = destinations.find(d => d.id === id);
+            if (!item) return;
+
+            currentDetailId = id;
+            const container = document.getElementById('detailContent');
+
+            container.innerHTML = `
+                <div class="relative h-64 rounded-2xl overflow-hidden bg-slate-100">
+                    <img src="${item.photoUrl}" alt="${item.placeName}" class="w-full h-full object-cover">
+                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black shadow-md flex items-center gap-1.5">
+                        <span>${item.flag}</span>
+                        <span>${item.country}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800">${item.placeName}</h2>
+                    <p class="text-xs font-bold text-slate-500">Student Travel Report & Postcard</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold">
+                    <div class="bg-indigo-50/80 p-3.5 rounded-2xl border border-indigo-100">
+                        <strong class="text-indigo-700 block mb-1">👁️ What to SEE:</strong>
+                        <p class="text-slate-700">${item.see || '<span class="text-slate-400 italic">None specified</span>'}</p>
+                    </div>
+
+                    <div class="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-100">
+                        <strong class="text-amber-700 block mb-1">🍕 What to EAT:</strong>
+                        <p class="text-slate-700">${item.eat || '<span class="text-slate-400 italic">None specified</span>'}</p>
+                    </div>
+
+                    <div class="bg-emerald-50/80 p-3.5 rounded-2xl border border-emerald-100">
+                        <strong class="text-emerald-700 block mb-1">🛍️ What to BUY:</strong>
+                        <p class="text-slate-700">${item.buy || '<span class="text-slate-400 italic">None specified</span>'}</p>
+                    </div>
+
+                    <div class="bg-purple-50/80 p-3.5 rounded-2xl border border-purple-100">
+                        <strong class="text-purple-700 block mb-1">🎉 What to ENJOY:</strong>
+                        <p class="text-slate-700">${item.enjoy || '<span class="text-slate-400 italic">None specified</span>'}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        function printCurrentDetail() {
+            window.print();
+        }
+
+        function confirmResetData() {
+            if (confirm('Reset all student destinations to default starter state?')) {
+                destinations = [...INITIAL_ENTRIES];
+                bookedVisas = [];
+                saveData();
+                render();
+            }
+        }
+
+        const WORLD_COUNTRIES = [
+            { name: "Japan", code: "JP", flag: "🇯🇵" },
+            { name: "France", code: "FR", flag: "🇫🇷" },
+            { name: "Italy", code: "IT", flag: "🇮🇹" },
+            { name: "India", code: "IN", flag: "🇮🇳" },
+            { name: "United States", code: "US", flag: "🇺🇸" },
+            { name: "United Kingdom", code: "GB", flag: "🇬🇧" },
+            { name: "Egypt", code: "EG", flag: "🇪🇬" },
+            { name: "Australia", code: "AU", flag: "🇦🇺" },
+            { name: "Brazil", code: "BR", flag: "🇧🇷" },
+            { name: "Canada", code: "CA", flag: "🇨🇦" },
+            { name: "China", code: "CN", flag: "🇨🇳" },
+            { name: "Germany", code: "DE", flag: "🇩🇪" },
+            { name: "Greece", code: "GR", flag: "🇬🇷" },
+            { name: "Indonesia", code: "ID", flag: "🇮🇩" },
+            { name: "Mexico", code: "MX", flag: "🇲🇽" },
+            { name: "Peru", code: "PE", flag: "🇵🇪" },
+            { name: "South Africa", code: "ZA", flag: "🇿🇦" },
+            { name: "Spain", code: "ES", flag: "🇪🇸" },
+            { name: "Thailand", code: "TH", flag: "🇹🇭" },
+            { name: "Turkey", code: "TR", flag: "🇹🇷" },
+            { name: "Vietnam", code: "VN", flag: "🇻🇳" }
+        ];
+
+        const INITIAL_ENTRIES = [
+            {
+                id: 'dest-1',
+                placeName: 'Mount Fuji',
+                country: 'Japan',
+                countryCode: 'JP',
+                flag: '🇯🇵',
+                photoUrl: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
+                see: 'Snowy peaks, cherry blossom trees, and crater views from Lake Kawaguchiko.',
+                eat: 'Hot bowl of miso ramen and matcha green tea ice cream.',
+                buy: 'Handcrafted wooden Daruma doll and Mt. Fuji souvenir keychains.',
+                enjoy: 'Hiking up to station 5 and taking photos during sunrise.',
+                votes: 0
+            },
+            {
+                id: 'dest-2',
+                placeName: 'Eiffel Tower',
+                country: 'France',
+                countryCode: 'FR',
+                flag: '🇫🇷',
+                photoUrl: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=800&q=80',
+                see: 'Golden light show at night and panoramic views of Paris.',
+                eat: 'Freshly baked chocolate croissants and colourful macarons.',
+                buy: 'Miniature Eiffel Tower models and beret hats.',
+                enjoy: 'Picnicking on the Champ de Mars grass lawn with classmates.',
+                votes: 0
+            },
+            {
+                id: 'dest-3',
+                placeName: 'Colosseum',
+                country: 'Italy',
+                countryCode: 'IT',
+                flag: '🇮🇹',
+                photoUrl: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80',
+                see: 'Ancient stone arches, underground gladiator tunnels, and Roman ruins.',
+                eat: 'Authentic wood-fired Margherita pizza and pistachio gelato.',
+                buy: 'Gladiator helmet souvenirs and postcard sets.',
+                enjoy: 'Exploring ancient history on a guided walking tour.',
+                votes: 0
+            }
+        ];
+
+        let destinations = [];
+        let bookedVisas = [];
+        let currentDetailId = null;
+
+        window.onload = function() {
+            const savedDestinations = localStorage.getItem('mwe_destinations_v2');
+            const savedVisas = localStorage.getItem('mwe_booked_visas_v2');
+            const savedPassport = localStorage.getItem('mwe_passport_info_v2');
+
+            if (savedDestinations) {
+                try { destinations = JSON.parse(savedDestinations); } catch(e) { destinations = [...INITIAL_ENTRIES]; }
+            } else {
+                destinations = [...INITIAL_ENTRIES];
+            }
+
+            if (savedVisas) {
+                try { bookedVisas = JSON.parse(savedVisas); } catch(e) { bookedVisas = []; }
+            }
+
+            if (savedPassport) {
+                try {
+                    const p = JSON.parse(savedPassport);
+                    if (p.name) document.getElementById('passportNameInput').value = p.name;
+                    if (p.grade) document.getElementById('passportGradeInput').value = p.grade;
+                    if (p.number) document.getElementById('passportNumberInput').value = p.number;
+                    if (p.photo) document.getElementById('passportPhotoImg').src = p.photo;
+                } catch(e) {}
+            }
+
+            populateCountrySelect();
+            render();
+        };
+
+        function downloadPassportPNG() {
+            playClickSound();
+            const captureArea = document.getElementById('passportCaptureArea');
+
+            const originalScrollY = window.scrollY;
+            window.scrollTo(0, 0);
+
+            html2canvas(captureArea, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#eff6ff',
+                logging: false,
+                scrollY: 0,
+                scrollX: 0,
+                windowWidth: document.documentElement.offsetWidth,
+                onclone: (clonedDoc) => {
+                    const clonedArea = clonedDoc.getElementById('passportCaptureArea');
+                    if (clonedArea) {
+                        clonedArea.style.transform = 'none';
+                        const inputs = clonedArea.querySelectorAll('input[type="text"]');
+                        inputs.forEach(input => {
+                            const div = clonedDoc.createElement('div');
+                            div.className = input.className;
+                            div.style.display = 'flex';
+                            div.style.alignItems = 'center';
+                            div.style.minHeight = '42px';
+                            div.textContent = input.value;
+                            input.parentNode.replaceChild(div, input);
+                        });
+                    }
+                }
+            }).then(canvas => {
+                const link = document.createElement('a');
+                const studentName = document.getElementById('passportNameInput').value.trim() || 'Student';
+                link.download = `Official_Passport_${studentName.replace(/\s+/g, '_')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                window.scrollTo(0, originalScrollY);
+            }).catch(err => {
+                console.error("Download Error:", err);
+                window.scrollTo(0, originalScrollY);
+            });
+        }
+    </script>
+</body>
+</html>
